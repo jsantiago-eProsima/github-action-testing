@@ -1,0 +1,39 @@
+name: Options testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      choice:
+        required: true
+        default: 'choice_1' 
+        type: choice
+        options:
+        - choice_1
+        - choice_2
+        - choice_3
+        - choice_4
+        - choice_5
+
+
+jobs:
+  options-save:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - id: list-choices
+        run: |
+          echo "choices=$(python3 -c 'print( ${{ inputs.choice.options }}) )'" >> $GITHUB_OUTPUT
+
+    outputs:
+      choices: ${{ steps.list-choices.outputs.choices }}
+
+  
+  echo-choices:
+    runs-on: ubuntu-latest
+    needs: options-save
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - id: list-choices
+        run: |
+          echo ${{ needs.options-save.outputs.choices }}
